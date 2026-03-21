@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@theme {
+  --color-diff-new: #16a34a;
+  --color-diff-del: #dc2626;
+  --color-diff-grow: #d97706;
+  --color-diff-shrink: #2563eb;
+  
+  --color-panel-bg: #f3f4f6;
+  --color-content-bg: #ffffff;
+  --color-border-subtle: #e5e7eb;
+  --color-border-strong: #9ca3af;
+  --color-toolbar-bg: #f9fafb;
+  --color-selection: #cce8ff;
+  --color-selection-border: #99d1ff;
+}
+
+body {
+  font-family: "Segoe UI", "Segoe UI Variable", "Microsoft YaHei", sans-serif;
+  background-color: var(--color-panel-bg);
+  color: #111827;
+  font-size: 12px;
+  overflow: hidden;
+  user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-left: 1px solid #e5e7eb;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border: 2px solid #f1f1f1;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+  border: 2px solid #f1f1f1;
+  background-clip: padding-box;
+}
+
+.splitter-v {
+  width: 4px;
+  cursor: col-resize;
+  background-color: var(--color-panel-bg);
+  border-left: 1px solid var(--color-border-strong);
+  border-right: 1px solid var(--color-border-strong);
+  z-index: 10;
+}
+.splitter-h {
+  height: 4px;
+  cursor: row-resize;
+  background-color: var(--color-panel-bg);
+  border-top: 1px solid var(--color-border-strong);
+  border-bottom: 1px solid var(--color-border-strong);
+  z-index: 10;
+}
+
+.table-header {
+  background: var(--color-toolbar-bg);
+  border-bottom: 1px solid var(--color-border-strong);
+  border-right: 1px solid var(--color-border-subtle);
+  font-weight: normal;
+  text-align: left;
+  padding: 4px 8px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table-cell {
+  padding: 2px 8px;
+  border-right: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid #f3f4f6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-row:hover {
+  background-color: #f3f4f6;
+}
+.table-row.selected {
+  background-color: var(--color-selection);
+  outline: 1px solid var(--color-selection-border);
+  outline-offset: -1px;
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tree-item:hover {
+  background-color: #f3f4f6;
+}
+.tree-item.selected {
+  background-color: var(--color-selection);
+  outline: 1px solid var(--color-selection-border);
+  outline-offset: -1px;
+}
