@@ -1,23 +1,33 @@
-﻿using System.Text;
+using DiskDiff.App.ViewModels;
+using DiskDiff.Core.Models;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DiskDiff.App;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(MainWindowViewModel viewModel)
     {
         InitializeComponent();
+        DataContext = viewModel;
+    }
+
+    private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
+
+    private void DirectoryTree_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
+        if (e.NewValue is FolderTreeItemViewModel item)
+        {
+            ViewModel.SelectDirectory(item.Path);
+        }
+    }
+
+    private void DetailsGrid_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (DetailsGrid.SelectedItem is DetailRowViewModel row && row.EntryType == EntryType.Directory)
+        {
+            ViewModel.SelectDirectory(row.Path);
+        }
     }
 }
