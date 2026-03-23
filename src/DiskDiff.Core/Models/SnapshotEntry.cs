@@ -58,9 +58,15 @@ public sealed record SnapshotEntry(
     private static string GetParentPath(string normalizedPath)
     {
         var parent = global::System.IO.Path.GetDirectoryName(normalizedPath);
-        return string.IsNullOrEmpty(parent)
-            ? normalizedPath
-            : WindowsPathNormalizer.Normalize(parent);
+        if (string.IsNullOrEmpty(parent))
+        {
+            return string.Empty;
+        }
+
+        var normalizedParent = WindowsPathNormalizer.Normalize(parent);
+        return string.Equals(normalizedParent, normalizedPath, StringComparison.OrdinalIgnoreCase)
+            ? string.Empty
+            : normalizedParent;
     }
 
     private static string GetName(string normalizedPath)
@@ -71,4 +77,3 @@ public sealed record SnapshotEntry(
             : name;
     }
 }
-

@@ -11,60 +11,21 @@ public static class WindowsPathNormalizer
 
         var fullPath = Path.GetFullPath(rawPath).Replace('/', '\\');
 
+        if (fullPath.Length >= 2 && fullPath[1] == ':')
+        {
+            fullPath = char.ToUpperInvariant(fullPath[0]) + fullPath[1..];
+        }
+
         if (IsDriveRoot(fullPath))
         {
-            return $"{char.ToUpperInvariant(fullPath[0])}:\\";
+            return fullPath;
         }
 
-        var trimmedPath = fullPath.TrimEnd('\\');
-
-        if (trimmedPath.Length >= 2 && trimmedPath[1] == ':')
-        {
-            var drivePrefix = $"{char.ToUpperInvariant(trimmedPath[0])}:";
-            var remainder = trimmedPath[2..];
-            var normalizedRemainder = NormalizeSegments(remainder);
-            return drivePrefix + normalizedRemainder;
-        }
-
-        return trimmedPath;
+        return fullPath.TrimEnd('\\');
     }
 
     private static bool IsDriveRoot(string path)
     {
         return path.Length == 3 && char.IsLetter(path[0]) && path[1] == ':' && path[2] == '\\';
-    }
-
-    private static string NormalizeSegments(string remainder)
-    {
-        if (string.IsNullOrEmpty(remainder))
-        {
-            return "\\";
-        }
-
-        var segments = remainder
-            .Split('\\', StringSplitOptions.RemoveEmptyEntries)
-            .Select(NormalizeSegment);
-
-        return "\\" + string.Join("\\", segments);
-    }
-
-    private static string NormalizeSegment(string segment)
-    {
-        if (segment.Length == 0)
-        {
-            return segment;
-        }
-
-        if (!char.IsLetter(segment[0]))
-        {
-            return segment;
-        }
-
-        if (segment.Length == 1)
-        {
-            return char.ToUpperInvariant(segment[0]).ToString();
-        }
-
-        return char.ToUpperInvariant(segment[0]) + segment[1..].ToLowerInvariant();
     }
 }
