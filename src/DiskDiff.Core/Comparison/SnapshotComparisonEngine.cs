@@ -1,4 +1,5 @@
 using DiskDiff.Core.Models;
+using DiskDiff.Core.Pathing;
 
 namespace DiskDiff.Core.Comparison;
 
@@ -8,8 +9,8 @@ public static class SnapshotComparisonEngine
         IReadOnlyCollection<SnapshotEntry> previousEntries,
         IReadOnlyCollection<SnapshotEntry> currentEntries)
     {
-        var previousByPath = previousEntries.ToDictionary(entry => entry.Path, StringComparer.OrdinalIgnoreCase);
-        var currentByPath = currentEntries.ToDictionary(entry => entry.Path, StringComparer.OrdinalIgnoreCase);
+        var previousByPath = BuildIndex(previousEntries);
+        var currentByPath = BuildIndex(currentEntries);
 
         var allPaths = new HashSet<string>(previousByPath.Keys, StringComparer.OrdinalIgnoreCase);
         allPaths.UnionWith(currentByPath.Keys);
@@ -48,6 +49,19 @@ public static class SnapshotComparisonEngine
         return result;
     }
 
+    private static Dictionary<string, SnapshotEntry> BuildIndex(IReadOnlyCollection<SnapshotEntry> entries)
+    {
+        var index = new Dictionary<string, SnapshotEntry>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entry in entries)
+        {
+            var normalizedKey = WindowsPathNormalizer.Normalize(entry.Path);
+            index[normalizedKey] = entry;
+        }
+
+        return index;
+    }
+
     private static ChangeType ResolveChangeType(SnapshotEntry? previousEntry, SnapshotEntry? currentEntry)
     {
         if (previousEntry is null && currentEntry is not null)
@@ -63,6 +77,11 @@ public static class SnapshotComparisonEngine
         if (previousEntry is null || currentEntry is null)
         {
             throw new InvalidOperationException("Comparison entries cannot both be null.");
+        }
+
+        if (previousEntry.EntryType != currentEntry.EntryType)
+        {
+            return ChangeType.SizeChanged;
         }
 
         if (previousEntry.LogicalBytes != currentEntry.LogicalBytes

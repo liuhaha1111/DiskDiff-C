@@ -50,4 +50,35 @@ public sealed class SnapshotComparisonEngineTests
 
         result.Should().ContainSingle(x => x.ChangeType == ChangeType.Unchanged);
     }
+
+    [Fact]
+    public void Compare_matches_entries_with_equivalent_paths_in_different_raw_forms()
+    {
+        var previous = new[]
+        {
+            SnapshotEntry.File("C:\\Temp\\a.bin", 10, 10) with { Path = "c:/Temp/a.bin" },
+        };
+        var current = new[]
+        {
+            SnapshotEntry.File("C:\\Temp\\a.bin", 10, 10) with { Path = "C:\\Temp\\a.bin" },
+        };
+
+        var result = SnapshotComparisonEngine.Compare(previous, current);
+
+        result.Should().ContainSingle(x => x.ChangeType == ChangeType.Unchanged);
+    }
+
+    [Fact]
+    public void Compare_marks_entry_type_mismatch_at_same_path_as_size_changed()
+    {
+        var previous = new[] { SnapshotEntry.File("C:\\Temp\\item", 10, 10) };
+        var current = new[]
+        {
+            SnapshotEntry.Directory("C:\\Temp\\item") with { LogicalBytes = 10, AllocatedBytes = 10 },
+        };
+
+        var result = SnapshotComparisonEngine.Compare(previous, current);
+
+        result.Should().ContainSingle(x => x.ChangeType == ChangeType.SizeChanged);
+    }
 }
